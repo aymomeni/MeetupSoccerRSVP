@@ -2,9 +2,6 @@ package com.momeni.meetuprsvp;
 
 import java.util.*;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -15,7 +12,7 @@ import org.json.*;
 public class MeetupRestService {
 
 	private static List<SoccerEvent> _allEvents;
-	private static String _KEY = "MEETUPKEYS";
+	private static final String _KEY = "7e454df4306b31417030a7e5f582b";
 	private static Timer timer;
 	
 	public MeetupRestService(int seconds){
@@ -27,37 +24,6 @@ public class MeetupRestService {
 	public static void main(String[] args){
 
 		_allEvents = new LinkedList<SoccerEvent>();
-		
-		// Meetup keys are private and mine is loaded from a file that doesn't show up in github
-		
-		  
-		BufferedReader buffFileReader;
-		try {
-			URL path = MeetupRestService.class.getResource("keys.txt");
-			File file = new File(path.getFile()); 
-			buffFileReader = new BufferedReader(new FileReader(file));
-			String st; 
-			  try {
-				while ((st = buffFileReader.readLine()) != null) 
-				  {
-					  if(st.isEmpty() || st == null){
-						  System.out.println("Key file corrupt");
-						  System.exit(-1);
-					  }
-					  _KEY = st; 
-				  }
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} 
-		  
-		 
-		  
-		_KEY = _KEY.trim();
-		System.out.println(_KEY);
-		
 		// on startup read in all events and fill event objects
 		// check if any events are rsvp "no" (or waitlist)
 		// else put the events inside a queue sorted by rsvp time
@@ -92,8 +58,6 @@ public class MeetupRestService {
 		}
 		
 	}
-	
-	
 	
 	
 	public static void startUp(){
@@ -154,8 +118,7 @@ public class MeetupRestService {
 		
 		return soccEvent;
 	}
-
-
+	
 	
 	
 	// Prints a short summary of upcoming events

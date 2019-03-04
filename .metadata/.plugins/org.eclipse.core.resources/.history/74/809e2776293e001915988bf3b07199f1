@@ -29,12 +29,10 @@ public class MeetupRestService {
 		_allEvents = new LinkedList<SoccerEvent>();
 		
 		// Meetup keys are private and mine is loaded from a file that doesn't show up in github
-		
+		File file = new File("keys.txt"); 
 		  
 		BufferedReader buffFileReader;
 		try {
-			URL path = MeetupRestService.class.getResource("keys.txt");
-			File file = new File(path.getFile()); 
 			buffFileReader = new BufferedReader(new FileReader(file));
 			String st; 
 			  try {

@@ -3,7 +3,6 @@ package com.momeni.meetuprsvp;
 import java.util.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,31 +28,23 @@ public class MeetupRestService {
 		_allEvents = new LinkedList<SoccerEvent>();
 		
 		// Meetup keys are private and mine is loaded from a file that doesn't show up in github
-		
+		File file = new File("C:\\Users\\pankaj\\Desktop\\test.txt"); 
 		  
-		BufferedReader buffFileReader;
-		try {
-			URL path = MeetupRestService.class.getResource("keys.txt");
-			File file = new File(path.getFile()); 
-			buffFileReader = new BufferedReader(new FileReader(file));
-			String st; 
-			  try {
-				while ((st = buffFileReader.readLine()) != null) 
-				  {
-					  if(st.isEmpty() || st == null){
-						  System.out.println("Key file corrupt");
-						  System.exit(-1);
-					  }
-					  _KEY = st; 
+		 BufferedReader buffFileReader = new BufferedReader(new FileReader(file)); 
+		  
+		 String st; 
+		  try {
+			while ((st = buffFileReader.readLine()) != null) 
+			  {
+				  if(st.isEmpty() || st == null){
+					  System.out.println("Key file corrupt");
+					  System.exit(-1);
 				  }
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+				  _KEY = st; 
+			  }
+		} catch (IOException e) {
+			e.printStackTrace();
 		} 
-		  
-		 
 		  
 		_KEY = _KEY.trim();
 		System.out.println(_KEY);
