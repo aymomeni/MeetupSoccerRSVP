@@ -20,18 +20,36 @@ public class MeetupRestService {
 	
 	public MeetupRestService(int seconds){
 		timer = new Timer();
-		timer.schedule(new CheckEventsTask(), seconds*1000);
+		timer.schedule(new CheckEvents(), seconds*1000);
 	}	
 	
 	public static void main(String[] args){
 
 		_allEvents = new LinkedList<SoccerEvent>();
-
+		
+		// Meetup keys are private and mine is loaded from a file that doesn't show up in github
 		readKeyFromFile();
+		
+		
+		// on startup read in all events and fill event objects
+		// check if any events are rsvp "no" (or waitlist)
+		// else put the events inside a queue sorted by rsvp time
+		
+		// create some sort of background task or scheduler that performs rsvp at a given time
+		
+		// daily look for new events and any cancelled events
+		
 		//startUp();
+		
+//		for(SoccerEvent sE : _allEvents){
+//			System.out.println(sE.getName());
+//			System.out.println(sE.getTime());
+//		}
 		
 		new MeetupRestService(10);
 		System.out.println("TaskScheduled");
+		
+		//printSummaryOfNextEightEvents(_KEY);
 		
 	}
 	
@@ -62,17 +80,19 @@ public class MeetupRestService {
 		_KEY = _KEY.trim();
 	}
 
-	
-	class CheckEventsTask extends TimerTask {
+	class CheckEvents extends TimerTask {
+
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 			printSummaryOfNextEightEvents(_KEY);
 			timer.cancel();
 			timer = new Timer();
-			timer.schedule(new CheckEventsTask(), 10000);
+			timer.schedule(new CheckEvents(), 10000);
 		}
+		
 	}
+	
 	
 	
 	public static void startUp(){
