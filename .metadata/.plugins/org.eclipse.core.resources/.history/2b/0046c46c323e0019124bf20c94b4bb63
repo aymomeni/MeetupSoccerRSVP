@@ -28,7 +28,7 @@ public class MeetupRestService {
 	
 	public static void main(String[] args) {
 
-		readKeyFromFile();
+		//readKeyFromFile();
 		//setUpDailyTaskTimer();
 		//startUp();
 		rsvpToEvent(_KEY, "bbxnrqyzfbmb");

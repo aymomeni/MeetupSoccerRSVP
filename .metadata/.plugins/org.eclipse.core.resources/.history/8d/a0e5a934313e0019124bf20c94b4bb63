@@ -28,7 +28,7 @@ public class MeetupRestService {
 	
 	public static void main(String[] args) {
 
-		readKeyFromFile();
+		//readKeyFromFile();
 		//setUpDailyTaskTimer();
 		//startUp();
 		rsvpToEvent(_KEY, "bbxnrqyzfbmb");
@@ -144,9 +144,7 @@ public class MeetupRestService {
 		
 		try {	
 		
-			//URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=yes&key="+key+"\"");
-			URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=waitlist&key="+key);
-			System.out.println(url.toString());
+			URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=yes&key="+key+"\"");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
@@ -154,9 +152,9 @@ public class MeetupRestService {
 
 //			String input = "{\"event_id\"="+eventId+",\"rsvp\"=\"yes\"}";
 
-			OutputStream os = conn.getOutputStream();
+//			OutputStream os = conn.getOutputStream();
 //			os.write(input.getBytes());
-			os.flush();
+//			os.flush();
 
 			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
 				throw new RuntimeException("Failed : HTTP error code : "

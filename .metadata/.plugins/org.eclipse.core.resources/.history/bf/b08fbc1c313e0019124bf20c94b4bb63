@@ -7,9 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.json.*;
@@ -18,43 +16,25 @@ public class MeetupRestService {
 
 	private static List<SoccerEvent> _allEvents;
 	private static String _KEY = "MEETUPKEYS";
-	private static Timer _dailyTimer;
-	private static int _milliSecondsInADay;
+	private static Timer timer;
 	
-	public MeetupRestService(int seconds) {
-		_allEvents = new LinkedList<SoccerEvent>();
-		_milliSecondsInADay = 24*60*60*1000;
+	public MeetupRestService(int seconds){
+		timer = new Timer();
+		timer.schedule(new CheckEventsTask(), seconds*1000);
 	}	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args){
+
+		_allEvents = new LinkedList<SoccerEvent>();
 
 		readKeyFromFile();
-		//setUpDailyTaskTimer();
 		//startUp();
-		rsvpToEvent(_KEY, "bbxnrqyzfbmb");
 		
 		new MeetupRestService(10);
 		System.out.println("TaskScheduled");
 		
 	}
 	
-	private static void setUpDailyTaskTimer() {
-		_dailyTimer = new Timer();
-		_dailyTimer.schedule(new CheckEventsTask(), _milliSecondsInADay); // second argument in milliseconds
-	}
-	
-	static class CheckEventsTask extends TimerTask {
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			// Do what needs to be done daily
-			printSummaryOfNextEightEvents(_KEY);
-			_dailyTimer.cancel();
-			_dailyTimer = new Timer();
-			_dailyTimer.schedule(new CheckEventsTask(), _milliSecondsInADay);
-		}
-	}
-
 	private static void readKeyFromFile() {
 		
 		try {
@@ -82,6 +62,19 @@ public class MeetupRestService {
 		_KEY = _KEY.trim();
 	}
 
+	
+	class CheckEventsTask extends TimerTask {
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			printSummaryOfNextEightEvents(_KEY);
+			timer.cancel();
+			timer = new Timer();
+			timer.schedule(new CheckEventsTask(), 10000);
+		}
+	}
+	
+	
 	public static void startUp(){
 		
 		try{
@@ -126,6 +119,7 @@ public class MeetupRestService {
 		
 	}
 	
+	
 	private static SoccerEvent fillSoccerBeanFromJSON(JSONObject event){
 		
 		SoccerEvent soccEvent = new SoccerEvent();
@@ -139,53 +133,7 @@ public class MeetupRestService {
 		
 		return soccEvent;
 	}
-	
-	private static void rsvpToEvent(String key, String eventId) {
-		
-		try {	
-		
-			//URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=yes&key="+key+"\"");
-			URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=waitlist&key="+key);
-			System.out.println(url.toString());
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
 
-//			String input = "{\"event_id\"="+eventId+",\"rsvp\"=\"yes\"}";
-
-			OutputStream os = conn.getOutputStream();
-//			os.write(input.getBytes());
-			os.flush();
-
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-				throw new RuntimeException("Failed : HTTP error code : "
-						+ conn.getResponseCode());
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
-
-			String output;
-			System.out.println("Output from Server .... \n");
-			
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-
-			conn.disconnect();
-
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-
-		}
-	  
-	}
 
 	
 	// Prints a short summary of upcoming events
