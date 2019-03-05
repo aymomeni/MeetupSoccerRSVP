@@ -11,7 +11,7 @@ public class SoccerEvent {
 	private String status;
 	private String local_date;
 	private String local_time;
-	private String rsvp_open_offset = null; // Format e.g. PT151H30M -> Prior to event by 151 hours and 30 min
+	private String rsvp_open_offset; // Format e.g. PT151H30M -> Prior to event by 151 hours and 30 min
 	private boolean rsvp_boolean; // true if rsvp is yes, false otherwise
 	private boolean waitlisted; // if waitlisted true else false
 	
@@ -77,25 +77,17 @@ public class SoccerEvent {
 		this.waitlisted = waitlisted;
 	}
 	
-	public long getSecondsPriorToGameTime(){
-		
-		return this.regexMatcherForPT();
+	public void getSecondsEpochPriorToGameTime(){
 		
 	}
 	
-	public long regexMatcherForPT(){
+	public void regexMatcherForPT(String rsvp_open_offset){
 		
-		if(this.rsvp_open_offset == null){
-			return -1;
+		if(rsvp_open_offset.equals(null)){
+			return;
 		}
 		
-		long seconds;
-		
-		String pattern = "PT(?<hours>\\d+)H(?<minutes>\\d+)*M?";
-		String hours = null;
-		String minutes = null;
-		int Ihours = 0;
-		int Iminutes = 0;
+		String pattern = "PT(?<hours>\\d+)H(?<minutes>\\d)*M?";
 		
 		// Create a Pattern object
 	      Pattern r = Pattern.compile(pattern);
@@ -104,22 +96,19 @@ public class SoccerEvent {
 	      Matcher m = r.matcher(rsvp_open_offset);
 	      if (m.find( )) {
 
-	    	 hours = m.group("hours");
-	    	 minutes = m.group("minutes"); 	  
-
-	    	  	    	  
-	      } else {
+	    	  System.out.println("Found value: " + m.group("hours") );
+	    	  try{
+	    		  System.out.println("Found value: " + m.group("minutes") );
+	    	  
+	    	  }catch(IllegalArgumentException e){
+	    		  e.printStackTrace();
+	    	  }
+	    	  
+	    	  
+	      }else {
 	         System.out.println("NO MATCH");
 	      }
-	      
-	      if(hours != null && minutes != null){
-	    	  return Long.parseLong(hours)*60*60 + Long.parseLong(minutes)*60;
-	      } else if(hours != null && minutes == null){
-	    	  return Long.parseLong(hours)*60*60;
-	      }
-	      
-	      return -1;
-	
+		
 	}
 	
 	

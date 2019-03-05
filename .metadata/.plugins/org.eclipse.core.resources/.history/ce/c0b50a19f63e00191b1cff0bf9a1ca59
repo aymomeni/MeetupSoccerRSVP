@@ -77,25 +77,17 @@ public class SoccerEvent {
 		this.waitlisted = waitlisted;
 	}
 	
-	public long getSecondsPriorToGameTime(){
-		
-		return this.regexMatcherForPT();
-		
+	public void getSecondsEpochPriorToGameTime(){
+		this.regexMatcherForPT(this.rsvp_open_offset);
 	}
 	
-	public long regexMatcherForPT(){
+	public void regexMatcherForPT(String rsvp_open_offset){
 		
-		if(this.rsvp_open_offset == null){
-			return -1;
+		if(rsvp_open_offset == null){
+			return;
 		}
 		
-		long seconds;
-		
 		String pattern = "PT(?<hours>\\d+)H(?<minutes>\\d+)*M?";
-		String hours = null;
-		String minutes = null;
-		int Ihours = 0;
-		int Iminutes = 0;
 		
 		// Create a Pattern object
 	      Pattern r = Pattern.compile(pattern);
@@ -104,22 +96,19 @@ public class SoccerEvent {
 	      Matcher m = r.matcher(rsvp_open_offset);
 	      if (m.find( )) {
 
-	    	 hours = m.group("hours");
-	    	 minutes = m.group("minutes"); 	  
-
-	    	  	    	  
-	      } else {
+	    	  System.out.println("Found value hours: " + m.group("hours") );
+	    	  try{
+	    		  System.out.println("Found value minutes: " + m.group("minutes") );
+	    	  
+	    	  }catch(IllegalArgumentException e){
+	    		  e.printStackTrace();
+	    	  }
+	    	  
+	    	  
+	      }else {
 	         System.out.println("NO MATCH");
 	      }
-	      
-	      if(hours != null && minutes != null){
-	    	  return Long.parseLong(hours)*60*60 + Long.parseLong(minutes)*60;
-	      } else if(hours != null && minutes == null){
-	    	  return Long.parseLong(hours)*60*60;
-	      }
-	      
-	      return -1;
-	
+		
 	}
 	
 	

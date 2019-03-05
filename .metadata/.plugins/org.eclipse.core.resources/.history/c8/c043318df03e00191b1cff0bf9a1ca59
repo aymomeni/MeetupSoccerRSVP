@@ -22,7 +22,8 @@ public class MeetupRestService {
 	private static int _milliSecondsInADay;
 	
 	public MeetupRestService() {
-		
+		_allEvents = new LinkedList<SoccerEvent>();
+		_milliSecondsInADay = 24*60*60*1000;
 	}	
 	
 	public static void main(String[] args) {
@@ -30,15 +31,11 @@ public class MeetupRestService {
 		readKeyFromFile();
 		//setUpDailyTaskTimer();
 		startUp();
-		
-		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getId() + " " + s.getRsvp_open_offset() + " " + s.getSecondsPriorToGameTime());
-		}
 		//rsvpToEvent(_KEY, "eventId");
 		//rsvpToEventWaitlist(_KEY, "bbxnrqyzfbmb");
 		
-		//new MeetupRestService();
-		//System.out.println("TaskScheduled");
+		new MeetupRestService();
+		System.out.println("TaskScheduled");
 		
 	}
 	
@@ -89,10 +86,7 @@ public class MeetupRestService {
 	public static void startUp(){
 		
 		try{
-			_allEvents = new LinkedList<SoccerEvent>();
-			_milliSecondsInADay = 24*60*60*1000;
-			
-			System.out.println("Startup: Connecting to server...");
+
 			URL url = new URL("https://api.meetup.com/Cottonwood-Co-Ed-Adult-Soccer/events?key=" + _KEY);
 
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -103,7 +97,6 @@ public class MeetupRestService {
 				throw new RuntimeException("Failed : Http error code : " 
 					+ conn.getResponseCode());
 			}
-			System.out.println("Startup: Connecting Successful...");
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 				conn.getInputStream()));
@@ -142,11 +135,8 @@ public class MeetupRestService {
 		soccEvent.setLocal_date(event.getString("local_date"));
 		soccEvent.setTime(event.getLong("time"));
 		soccEvent.setName(event.getString("name"));
-		try{
-			soccEvent.setRsvp_open_offset(event.getString("rsvp_open_offset"));
-		}catch(JSONException e){
-			soccEvent.setRsvp_open_offset(null);
-		}
+		soccEvent.setRsvp_open_offset(event.getString("rsvp_open_offset"));
+		soccEvent.getRsvp_open_offset();
 		
 		return soccEvent;
 	}

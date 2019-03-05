@@ -32,7 +32,8 @@ public class MeetupRestService {
 		startUp();
 		
 		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getId() + " " + s.getRsvp_open_offset() + " " + s.getSecondsPriorToGameTime());
+			System.out.println(s.getName() + "  " + s.getId());
+			s.getSecondsPriorToGameTime();
 		}
 		//rsvpToEvent(_KEY, "eventId");
 		//rsvpToEventWaitlist(_KEY, "bbxnrqyzfbmb");

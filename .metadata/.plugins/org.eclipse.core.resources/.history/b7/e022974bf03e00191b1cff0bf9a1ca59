@@ -22,23 +22,19 @@ public class MeetupRestService {
 	private static int _milliSecondsInADay;
 	
 	public MeetupRestService() {
-		
+		_allEvents = new LinkedList<SoccerEvent>();
+		_milliSecondsInADay = 24*60*60*1000;
 	}	
 	
 	public static void main(String[] args) {
 
 		readKeyFromFile();
 		//setUpDailyTaskTimer();
-		startUp();
+		//startUp();
+		rsvpToEvent(_KEY, "bbxnrqyzfbmb");
 		
-		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getId() + " " + s.getRsvp_open_offset() + " " + s.getSecondsPriorToGameTime());
-		}
-		//rsvpToEvent(_KEY, "eventId");
-		//rsvpToEventWaitlist(_KEY, "bbxnrqyzfbmb");
-		
-		//new MeetupRestService();
-		//System.out.println("TaskScheduled");
+		new MeetupRestService(10);
+		System.out.println("TaskScheduled");
 		
 	}
 	
@@ -89,10 +85,7 @@ public class MeetupRestService {
 	public static void startUp(){
 		
 		try{
-			_allEvents = new LinkedList<SoccerEvent>();
-			_milliSecondsInADay = 24*60*60*1000;
-			
-			System.out.println("Startup: Connecting to server...");
+
 			URL url = new URL("https://api.meetup.com/Cottonwood-Co-Ed-Adult-Soccer/events?key=" + _KEY);
 
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -103,7 +96,6 @@ public class MeetupRestService {
 				throw new RuntimeException("Failed : Http error code : " 
 					+ conn.getResponseCode());
 			}
-			System.out.println("Startup: Connecting Successful...");
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 				conn.getInputStream()));
@@ -141,19 +133,18 @@ public class MeetupRestService {
 		soccEvent.setId(event.getString("id"));
 		soccEvent.setLocal_date(event.getString("local_date"));
 		soccEvent.setTime(event.getLong("time"));
+		soccEvent.setDuration(event.getInt("duration"));
 		soccEvent.setName(event.getString("name"));
-		try{
-			soccEvent.setRsvp_open_offset(event.getString("rsvp_open_offset"));
-		}catch(JSONException e){
-			soccEvent.setRsvp_open_offset(null);
-		}
+		soccEvent.setRsvp_open_offset(event.getString("rsvp_open_offset"));
 		
 		return soccEvent;
 	}
 	
-	private static void rsvpToEventWaitlist(String key, String eventId) {
+	private static void rsvpToEvent(String key, String eventId) {
 		
 		try {	
+		
+			//URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=yes&key="+key+"\"");
 			URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=waitlist&key="+key);
 			System.out.println(url.toString());
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -162,54 +153,9 @@ public class MeetupRestService {
 			conn.setRequestProperty("Content-Type", "application/json");
 
 //			String input = "{\"event_id\"="+eventId+",\"rsvp\"=\"yes\"}";
-//			OutputStream os = conn.getOutputStream();
+
+			OutputStream os = conn.getOutputStream();
 //			os.write(input.getBytes());
-//			os.flush();
-			
-			OutputStream os = conn.getOutputStream();
-			os.flush();
-
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-				throw new RuntimeException("Failed : HTTP error code : "
-						+ conn.getResponseCode());
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
-
-			String output;
-			System.out.println("Output from Server .... \n");
-			
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-
-			conn.disconnect();
-
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-
-		}
-	  
-	}
-	
-	private static void rsvpToEvent(String key, String eventId) {
-		
-		try {	
-		
-			URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=yes&key="+key);
-			System.out.println(url.toString());
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
-
-			OutputStream os = conn.getOutputStream();
 			os.flush();
 
 			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
