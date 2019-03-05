@@ -32,7 +32,7 @@ public class MeetupRestService {
 		startUp();
 		
 		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getSecondsPriorToGameTime());
+			System.out.println(s.getName() + "  " + s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getSecondsPriorToGameTime());
 		}
 		//rsvpToEvent(_KEY, "eventId");
 		//rsvpToEventWaitlist(_KEY, "bbxnrqyzfbmb");
@@ -140,7 +140,6 @@ public class MeetupRestService {
 		
 		soccEvent.setId(event.getString("id"));
 		soccEvent.setLocal_date(event.getString("local_date"));
-		soccEvent.setLocal_time(event.getString("local_time"));
 		soccEvent.setTime(event.getLong("time"));
 		soccEvent.setName(event.getString("name"));
 		try{
