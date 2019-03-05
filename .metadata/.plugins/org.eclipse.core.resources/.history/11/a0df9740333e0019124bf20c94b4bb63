@@ -21,7 +21,7 @@ public class MeetupRestService {
 	private static Timer _dailyTimer;
 	private static int _milliSecondsInADay;
 	
-	public MeetupRestService() {
+	public MeetupRestService(int seconds) {
 		_allEvents = new LinkedList<SoccerEvent>();
 		_milliSecondsInADay = 24*60*60*1000;
 	}	
