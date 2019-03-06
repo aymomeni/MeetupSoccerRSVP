@@ -149,7 +149,6 @@ public class MeetupRestService {
 		
 			if(event.has("id") && event.has("name") && event.has("time") && event.has("local_date") && event.has("local_time") && event.has("rsvp_open_offset")){
 				soccEvent = new SoccerEvent();
-				soccEvent.setId(event.getString("id"));
 				soccEvent.setTime(event.getLong("time"));
 				soccEvent.setName(event.getString("name"));
 				soccEvent.setLocal_date(event.getString("local_date"));

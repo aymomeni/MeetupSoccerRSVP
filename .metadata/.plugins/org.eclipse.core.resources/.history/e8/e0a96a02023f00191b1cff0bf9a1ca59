@@ -79,19 +79,23 @@ public class SoccerEvent {
 	
 	public long getSecondsPriorToGameTime(){
 		
-		return this.getSecondsPTGameRSVPOpening();
+		return this.regexMatcherForPT();
 		
 	}
 	
-	public long getSecondsPTGameRSVPOpening(){
+	public long regexMatcherForPT(){
 		
 		if(this.rsvp_open_offset == null){
 			return -1;
 		}
 		
+		long seconds;
+		
 		String pattern = "PT(?<hours>\\d+)H(?<minutes>\\d+)*M?";
 		String hours = null;
 		String minutes = null;
+		int Ihours = 0;
+		int Iminutes = 0;
 		
 		// Create a Pattern object
 	      Pattern r = Pattern.compile(pattern);

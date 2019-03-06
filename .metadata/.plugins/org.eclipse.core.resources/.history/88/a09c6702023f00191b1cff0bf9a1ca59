@@ -29,7 +29,7 @@ public class MeetupRestService {
 
 		readKeyFromFile();
 		//setUpDailyTaskTimer();
-		getAllUpCommingEvents();
+		startUp();
 		
 		for(SoccerEvent s : _allEvents){
 			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getSecondsPriorToGameTime());
@@ -42,7 +42,6 @@ public class MeetupRestService {
 		
 	}
 	
-	@SuppressWarnings("unused")
 	private static void setUpDailyTaskTimer() {
 		_dailyTimer = new Timer();
 		_dailyTimer.schedule(new CheckEventsTask(), _milliSecondsInADay); // second argument in milliseconds
@@ -87,15 +86,13 @@ public class MeetupRestService {
 		_KEY = _KEY.trim();
 	}
 
-	
-	@SuppressWarnings("unused")
-	private static void getAllUpCommingEvents(){
-		
-		_allEvents = new LinkedList<SoccerEvent>();
+	public static void startUp(){
 		
 		try{
+			_allEvents = new LinkedList<SoccerEvent>();
+			_milliSecondsInADay = 24*60*60*1000;
 			
-			System.out.println("getAllUpCommingEvents() => Connecting to server...");
+			System.out.println("Startup: Connecting to server...");
 			URL url = new URL("https://api.meetup.com/Cottonwood-Co-Ed-Adult-Soccer/events?key=" + _KEY);
 
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -106,8 +103,7 @@ public class MeetupRestService {
 				throw new RuntimeException("Failed : Http error code : " 
 					+ conn.getResponseCode());
 			}
-			
-			System.out.println("getAllUpCommingEvents() => Server responded with 200 OK");
+			System.out.println("Startup: Connecting Successful...");
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 				conn.getInputStream()));
@@ -125,47 +121,37 @@ public class MeetupRestService {
 						
 			for(int i = 0; i < arr.length(); i++){
 				
-				JSONObject event = arr.getJSONObject(i);				
-				SoccerEvent sE = fillSoccerEventObjectFromJSONObject(event);				
-				if(sE == null){
-					continue;
-				} else{
-					_allEvents.add(sE);
-				}				
-			}			
-			System.out.println("getAllUpCommingEvents() => Successfully processed Server response");
-			
-		} catch(Exception e){
-			System.out.println("Something failed in getAllUpCommingEvents()");
+				JSONObject event = arr.getJSONObject(i);
+				
+				SoccerEvent sE = fillSoccerBeanFromJSON(event);
+				_allEvents.add(sE);
+			}
+
+		} catch(IOException e){
+
 			e.printStackTrace();
 		}
+		
 	}
 	
-
-	private static SoccerEvent fillSoccerEventObjectFromJSONObject(JSONObject event){
+	private static SoccerEvent fillSoccerBeanFromJSON(JSONObject event){
 		
-		SoccerEvent soccEvent = null;
+		SoccerEvent soccEvent = new SoccerEvent();
+		
+		soccEvent.setId(event.getString("id"));
+		soccEvent.setLocal_date(event.getString("local_date"));
+		soccEvent.setLocal_time(event.getString("local_time"));
+		soccEvent.setTime(event.getLong("time"));
+		soccEvent.setName(event.getString("name"));
 		try{
-		
-			if(event.has("id") && event.has("name") && event.has("time") && event.has("local_date") && event.has("local_time") && event.has("rsvp_open_offset")){
-				soccEvent = new SoccerEvent();
-				soccEvent.setId(event.getString("id"));
-				soccEvent.setTime(event.getLong("time"));
-				soccEvent.setName(event.getString("name"));
-				soccEvent.setLocal_date(event.getString("local_date"));
-				soccEvent.setLocal_time(event.getString("local_time"));
-				soccEvent.setRsvp_open_offset(event.getString("rsvp_open_offset"));
-			} else{
-				return null;
-			}
-		} catch(JSONException e){
-			System.out.println("Error in filling the soccEvent Object");
-			e.printStackTrace();
+			soccEvent.setRsvp_open_offset(event.getString("rsvp_open_offset"));
+		}catch(JSONException e){
+			soccEvent.setRsvp_open_offset(null);
 		}
+		
 		return soccEvent;
 	}
 	
-	@SuppressWarnings("unused")
 	private static void rsvpToEventWaitlist(String key, String eventId) {
 		
 		try {	
@@ -175,8 +161,7 @@ public class MeetupRestService {
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Content-Type", "application/json");
-			
-//	CODE BELOW IS WHEN POST INCLUDES A JSON PAYLOAD
+
 //			String input = "{\"event_id\"="+eventId+",\"rsvp\"=\"yes\"}";
 //			OutputStream os = conn.getOutputStream();
 //			os.write(input.getBytes());
@@ -214,7 +199,6 @@ public class MeetupRestService {
 	  
 	}
 	
-	@SuppressWarnings("unused")
 	private static void rsvpToEvent(String key, String eventId) {
 		
 		try {	
@@ -257,6 +241,7 @@ public class MeetupRestService {
 		}
 	  
 	}
+
 	
 	// Prints a short summary of upcoming events
 	public static void printSummaryOfNextEightEvents(String key){
