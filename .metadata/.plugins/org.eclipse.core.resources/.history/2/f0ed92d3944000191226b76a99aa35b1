@@ -21,6 +21,7 @@ public class MeetupRestService extends TimerTask {
 	private static List<String> _MeetupKeys;
 	private static Timer timer;
 	
+	
 	// TimerTask implementation from http://www.javapractices.com/topic/TopicAction.do?Id=54
 	private final static long fONCE_PER_DAY = 1000 * 60 * 60 * 24; // milliseconds
 	
@@ -33,16 +34,16 @@ public class MeetupRestService extends TimerTask {
 		_MeetupKeys = new ArrayList<String>();
 		_MeetupKeys.add("7e454df4306b31417030a7e5f582b");
 		
-		//getAllUpCommingEvents();
-		//printAllEventsCollection();
+		getAllUpCommingEvents();
+		printAllEventsCollection();
 		
-		TimerTask CheckEventsTask = new MeetupRestService();
+		//TimerTask CheckEventsTask = new MeetupRestService(); //TODO UNCOMMENT
 		
 		//perform the task once a day at 7 a.m., starting tomorrow morning
 	    //(other styles are possible as well)
 		
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY);
+		//Timer timer = new Timer(); //TODO UNCOMMENT
+		//timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY); //TODO UNCOMMENT
 	}
 
 
@@ -66,7 +67,7 @@ public class MeetupRestService extends TimerTask {
 			}		
 			try {
 				if(toRSVPToEvent != null){
-					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 3 seconds after the rsvp has opened
+					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+5000); // 5 seconds after the rsvp has opened
 				}				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
