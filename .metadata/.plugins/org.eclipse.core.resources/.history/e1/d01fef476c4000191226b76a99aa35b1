@@ -14,68 +14,50 @@ import java.net.URL;
 
 import org.json.*;
 
-public class MeetupRestService extends TimerTask {
+public class MeetupRestService {
 
 	private static List<SoccerEvent> _allEvents;
 	private static String _KEY = "MEETUPKEYS";
-	private static Timer timer;
+	private static Timer _dailyTimer;
+	private static int _milliSecondsInADay;
 	
-	
-	// TimerTask implementation from http://www.javapractices.com/topic/TopicAction.do?Id=54
-	// milliseconds
-	private final static long fONCE_PER_DAY = 1000 * 60 * 60 * 24;
-	
-	private final static int fONE_DAY = 1;
-	private final static int fSEVEN_AM = 7;
-	private final static int fZERO_MINUTES = 0;
+	public MeetupRestService() {
+		
+	}	
 	
 	public static void main(String[] args) {
 
 		readKeyFromFile();
-		
-		TimerTask CheckEventsTask = new MeetupRestService();
-		//perform the task once a day at 7 a.m., starting tomorrow morning
-	    //(other styles are possible as well)
-		timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY);
-		//rsvpToEvent(_KEY, "eventId");
-		//rsvpToEventWaitlist(_KEY, "bbxnrqyzfbmb");		
-	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
+		//setUpDailyTaskTimer();
 		getAllUpCommingEvents();
-		printAllEventsCollection();
-		checkIfAnythingToRSVPToday();
-		// find current time in epoch
-		// check if there is any events who's rsvp is open today
-		// if yes wait a given amount of time and then rsvp to the event
-		// if no don't do anything
+		
+		for(SoccerEvent s : _allEvents){
+			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getSecondsPriorToGameTime());
+		}
+		//rsvpToEvent(_KEY, "eventId");
+		//rsvpToEventWaitlist(_KEY, "bbxnrqyzfbmb");
+		
+		//new MeetupRestService();
+		//System.out.println("TaskScheduled");
+		
 	}
-		
-	private boolean checkIfAnythingToRSVPToday() {
-		
-		Date date = new Date();
-		long currentTimeEpochMilli = date.getTime();
-		
-		
-		
-		
-		return false;
+	
+	@SuppressWarnings("unused")
+	private static void setUpDailyTaskTimer() {
+		_dailyTimer = new Timer();
+		_dailyTimer.schedule(new CheckEventsTask(), _milliSecondsInADay); // second argument in milliseconds
 	}
-
-	private static Date getTomorrowMorning7am(){
-		Calendar tomorrow = new GregorianCalendar();
-		tomorrow.add(Calendar.DATE, fONE_DAY);
-		Calendar result = new GregorianCalendar(
-				tomorrow.get(Calendar.YEAR),
-				tomorrow.get(Calendar.MONTH),
-				tomorrow.get(Calendar.DATE),
-				fSEVEN_AM,
-				fZERO_MINUTES
-				
-		);		
-		return result.getTime();	
+	
+	static class CheckEventsTask extends TimerTask {
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			// Do what needs to be done daily
+			printSummaryOfNextEightEvents(_KEY);
+			_dailyTimer.cancel();
+			_dailyTimer = new Timer();
+			_dailyTimer.schedule(new CheckEventsTask(), _milliSecondsInADay);
+		}
 	}
 
 	private static void readKeyFromFile() {
@@ -106,6 +88,7 @@ public class MeetupRestService extends TimerTask {
 	}
 
 	
+	@SuppressWarnings("unused")
 	private static void getAllUpCommingEvents(){
 		
 		_allEvents = new LinkedList<SoccerEvent>();
@@ -275,19 +258,53 @@ public class MeetupRestService extends TimerTask {
 	  
 	}
 	
-	private static void printAllEventsCollection(){
+	// Prints a short summary of upcoming events
+	public static void printSummaryOfNextEightEvents(String key){
 		
-		if(_allEvents.isEmpty()){
-			return;
-		}		
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
-		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getSecondsPriorToGameTime());
+		try{
+
+			System.out.println("Client side request to meetup... ");
+			URL url = new URL("https://api.meetup.com/Cottonwood-Co-Ed-Adult-Soccer/events?key=" + key);
+
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", "application/json");
+
+			if(conn.getResponseCode() != 200){
+				throw new RuntimeException("Failed : Http error code : " 
+					+ conn.getResponseCode());
+			}
+
+			System.out.println("Response successfully received");
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+				conn.getInputStream()));
+
+			StringBuilder sB = new StringBuilder();
+			String output = "";
+			System.out.println("Response from Server .... \n");
+			
+			
+			while((output = br.readLine()) != null){
+				sB.append(output);
+			}
+
+			conn.disconnect();
+			
+			JSONArray arr = new JSONArray(sB.toString());
+			
+			for(int i = 0; i < 8; i++){
+				JSONObject event = arr.getJSONObject(i);
+				JSONObject venue = event.getJSONObject("venue");
+				System.out.println("ID: " + event.getString("id") + " Date: " + event.getString("local_date") + " Time: " + event.getString("local_time") + " VenueName: " + venue.getString("name") 
+						+ " RSVPOpenOffset: " + event.getString("rsvp_open_offset"));
+				
+				System.out.println();
+			}
+
+		} catch(IOException e){
+
+			e.printStackTrace();
 		}
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
 	}
 }
