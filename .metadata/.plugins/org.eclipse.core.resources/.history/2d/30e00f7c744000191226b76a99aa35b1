@@ -10,7 +10,6 @@ public class SoccerEvent {
 	private String local_date;
 	private String local_time;
 	private String rsvp_open_offset = null; // Format e.g. PT151H30M -> Prior to event by 151 hours and 30 min
-	private long timeMilliSecondsLeftUntilRsvpOpen = -1;
 	
 	public String getId() {
 		return id;
@@ -36,9 +35,6 @@ public class SoccerEvent {
 	public void setLocal_time(String local_time) {
 		this.local_time = local_time;
 	}
-	public String getRsvp_open_offset() {
-		return this.rsvp_open_offset;
-	}
 	public void setRsvp_open_offset(String rsvp_open_offset) {
 		this.rsvp_open_offset = rsvp_open_offset;
 	}
@@ -48,17 +44,12 @@ public class SoccerEvent {
 	public void setTime(long time) {
 		this.time = time;
 	}
-	public long getTimeMilliSecondsLeftUntilRSVPOpen(){
-		return this.timeMilliSecondsLeftUntilRsvpOpen;
-	}
-	public void setTimeMilliSecondsLeftUntilRSVPOpen(long milliSeconds){
-		this.timeMilliSecondsLeftUntilRsvpOpen = milliSeconds;
-	}
-	public long getMilliSecondsPTGameTimeOpening(){		
-		return this.getSecondsPTGameRSVPOpening()*1000;	
+	
+	public long getSecondsPTGameTime(){		
+		return this.getSecondsPTGameRSVPOpening();	
 	}
 	
-	private long getSecondsPTGameRSVPOpening(){
+	public long getSecondsPTGameRSVPOpening(){
 		
 		if(this.rsvp_open_offset == null){
 			return -1;
@@ -74,8 +65,11 @@ public class SoccerEvent {
 	      // Now create matcher object.
 	      Matcher m = r.matcher(rsvp_open_offset);
 	      if (m.find( )) {
+
 	    	 hours = m.group("hours");
 	    	 minutes = m.group("minutes"); 	  
+
+	    	  	    	  
 	      } else {
 	         System.out.println("NO MATCH");
 	      }

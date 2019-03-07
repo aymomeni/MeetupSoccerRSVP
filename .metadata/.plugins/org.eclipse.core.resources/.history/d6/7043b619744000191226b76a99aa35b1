@@ -17,7 +17,6 @@ import org.json.*;
 public class MeetupRestService extends TimerTask {
 
 	private static List<SoccerEvent> _allEvents;
-	private static List<SoccerEvent> _allEventsToRSVPToday;
 	private static String _KEY = "MEETUPKEYS";
 	private static Timer timer;
 	
@@ -47,51 +46,23 @@ public class MeetupRestService extends TimerTask {
 		// TODO Auto-generated method stub
 		getAllUpCommingEvents();
 		printAllEventsCollection();
-		boolean eventsToRSVPTo = checkIfAnythingToRSVPToday();
-		
-		if(eventsToRSVPTo){
-			
-			// grab the lowest event time TODO: maybe some other way is better
-			long lowest = Long.MAX_VALUE;
-			SoccerEvent toRSVPTOEvent = null;
-			for(SoccerEvent sE : _allEventsToRSVPToday){
-				if(sE.getTime() < lowest){
-					lowest = sE.getTime();
-				}
-			}
-		
-			try {
-				if(toRSVPTOEvent != null){
-					Thread.sleep(toRSVPTOEvent.getTimeMilliSecondsLeftUntilRSVPOpen());
-				}				
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			rsvpToEvent(_KEY, toRSVPTOEvent.getId());	
-		} 
-		
-		// else do nothing
+		checkIfAnythingToRSVPToday();
+		// find current time in epoch
+		// check if there is any events who's rsvp is open today
+		// if yes wait a given amount of time and then rsvp to the event
+		// if no don't do anything
 	}
 		
 	private boolean checkIfAnythingToRSVPToday() {
 		
 		Date date = new Date();
-		long currentTimeEpochMilliSeconds = date.getTime();
-		_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
+		long currentTimeEpochMilli = date.getTime();
 		
-		for(SoccerEvent sE : _allEvents){
-			long timeMilliSecondsLeftUntilRsvpOpen = (sE.getTime() - sE.getMilliSecondsPTGameTimeOpening()) - currentTimeEpochMilliSeconds;			
-			if(timeMilliSecondsLeftUntilRsvpOpen < fONCE_PER_DAY){
-				sE.setTimeMilliSecondsLeftUntilRSVPOpen(timeMilliSecondsLeftUntilRsvpOpen);
-				_allEventsToRSVPToday.add(sE);
-			}
-		}
-	
-		return !_allEventsToRSVPToday.isEmpty();
+		
+		
+		
+		return false;
 	}
-
 
 	private static Date getTomorrowMorning7am(){
 		Calendar tomorrow = new GregorianCalendar();
@@ -255,6 +226,7 @@ public class MeetupRestService extends TimerTask {
 		} catch (IOException e) {
 
 			e.printStackTrace();
+
 		}
 	  
 	}
@@ -312,7 +284,7 @@ public class MeetupRestService extends TimerTask {
 		System.out.println("================================================================================================================================");
 		System.out.println("================================================================================================================================");
 		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getMilliSecondsPTGameTimeOpening());
+			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getSecondsPriorToGameTime());
 		}
 		System.out.println("================================================================================================================================");
 		System.out.println("================================================================================================================================");

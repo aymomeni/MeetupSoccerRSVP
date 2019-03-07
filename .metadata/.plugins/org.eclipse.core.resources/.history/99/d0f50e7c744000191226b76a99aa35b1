@@ -61,18 +61,14 @@ public class MeetupRestService extends TimerTask {
 			}
 		
 			try {
-				if(toRSVPTOEvent != null){
-					Thread.sleep(toRSVPTOEvent.getTimeMilliSecondsLeftUntilRSVPOpen());
-				}				
+				Thread.sleep(toRSVPTOEvent.getTimeMilliSecondsLeftUntilRSVPOpen());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 			rsvpToEvent(_KEY, toRSVPTOEvent.getId());	
-		} 
-		
-		// else do nothing
+		}
 	}
 		
 	private boolean checkIfAnythingToRSVPToday() {
