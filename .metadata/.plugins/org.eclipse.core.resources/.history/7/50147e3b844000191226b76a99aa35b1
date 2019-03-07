@@ -33,17 +33,11 @@ public class MeetupRestService extends TimerTask {
 		
 		_MeetupKeys = new ArrayList<String>();
 		_MeetupKeys.add("7e454df4306b31417030a7e5f582b");
-		
-		getAllUpCommingEvents();
-		printAllEventsCollection();
-		
-		//TimerTask CheckEventsTask = new MeetupRestService(); //TODO UNCOMMENT
-		
+		TimerTask CheckEventsTask = new MeetupRestService();
 		//perform the task once a day at 7 a.m., starting tomorrow morning
 	    //(other styles are possible as well)
-		
-		//Timer timer = new Timer(); //TODO UNCOMMENT
-		//timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY); //TODO UNCOMMENT
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY);
 	}
 
 
@@ -55,19 +49,19 @@ public class MeetupRestService extends TimerTask {
 		printAllEventsCollection();
 		boolean eventsToRSVPTo = checkIfAnythingToRSVPToday();
 		
-		if(eventsToRSVPTo){		
+		if(eventsToRSVPTo){
+			
 			// grab the lowest event time (First game of day if there is multiple games) TODO: maybe some other way is better
 			long lowest = Long.MAX_VALUE;
-			SoccerEvent toRSVPToEvent = null;
+			SoccerEvent toRSVPTOEvent = null;
 			for(SoccerEvent sE : _allEventsToRSVPToday){
 				if(sE.getTime() < lowest){
 					lowest = sE.getTime();
-					toRSVPToEvent = sE;
 				}
 			}		
 			try {
-				if(toRSVPToEvent != null){
-					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+5000); // 5 seconds after the rsvp has opened
+				if(toRSVPTOEvent != null){
+					Thread.sleep(toRSVPTOEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+5000); // 5 seconds after the rsvp has opened
 				}				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -75,7 +69,7 @@ public class MeetupRestService extends TimerTask {
 			}
 			
 			for(int i = 0; i < _MeetupKeys.size(); i++){
-				rsvpToEvent(_MeetupKeys.get(i), toRSVPToEvent.getId());	
+				rsvpToEvent(_MeetupKeys.get(i), toRSVPTOEvent.getId());	
 			}
 			
 		} 

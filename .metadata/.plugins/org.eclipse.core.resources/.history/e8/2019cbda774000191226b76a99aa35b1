@@ -18,87 +18,43 @@ public class MeetupRestService extends TimerTask {
 
 	private static List<SoccerEvent> _allEvents;
 	private static List<SoccerEvent> _allEventsToRSVPToday;
-	private static List<String> _MeetupKeys;
+	private static String _KEY = "MEETUPKEYS";
 	private static Timer timer;
 	
 	
 	// TimerTask implementation from http://www.javapractices.com/topic/TopicAction.do?Id=54
-	private final static long fONCE_PER_DAY = 1000 * 60 * 60 * 24; // milliseconds
+	// milliseconds
+	private final static long fONCE_PER_DAY = 1000 * 60 * 60 * 24;
 	
 	private final static int fONE_DAY = 1;
 	private final static int fSEVEN_AM = 7;
 	private final static int fZERO_MINUTES = 0;
 	
 	public static void main(String[] args) {
+
+		readKeyFromFile();
 		
-		_MeetupKeys = new ArrayList<String>();
-		_MeetupKeys.add("7e454df4306b31417030a7e5f582b");
-		
-		getAllUpCommingEvents();
-		printAllEventsCollection();
-		
-		//TimerTask CheckEventsTask = new MeetupRestService(); //TODO UNCOMMENT
-		
+		TimerTask CheckEventsTask = new MeetupRestService();
 		//perform the task once a day at 7 a.m., starting tomorrow morning
 	    //(other styles are possible as well)
-		
-		//Timer timer = new Timer(); //TODO UNCOMMENT
-		//timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY); //TODO UNCOMMENT
+		Timer timer = new Timer();
+		//timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY);
+		timer.scheduleAtFixedRate(CheckEventsTask, 1000, 30000);
 	}
 
 
-	@SuppressWarnings("unused")
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		getAllUpCommingEvents();
-		printAllEventsCollection();
-		boolean eventsToRSVPTo = checkIfAnythingToRSVPToday();
-		
-		if(eventsToRSVPTo){		
-			// grab the lowest event time (First game of day if there is multiple games) TODO: maybe some other way is better
-			long lowest = Long.MAX_VALUE;
-			SoccerEvent toRSVPToEvent = null;
-			for(SoccerEvent sE : _allEventsToRSVPToday){
-				if(sE.getTime() < lowest){
-					lowest = sE.getTime();
-					toRSVPToEvent = sE;
-				}
-			}		
-			try {
-				if(toRSVPToEvent != null){
-					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+5000); // 5 seconds after the rsvp has opened
-				}				
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			for(int i = 0; i < _MeetupKeys.size(); i++){
-				rsvpToEvent(_MeetupKeys.get(i), toRSVPToEvent.getId());	
-			}
-			
-		} 
-		// else do nothing and wait for next day for another check
-	}
-	
-// Run method to roughly test this class	
 //	@Override
 //	public void run() {
 //		// TODO Auto-generated method stub
 //		getAllUpCommingEvents();
 //		printAllEventsCollection();
-//		boolean eventsToRSVPTo = true; //checkIfAnythingToRSVPToday();
+//		boolean eventsToRSVPTo = checkIfAnythingToRSVPToday();
 //		
 //		if(eventsToRSVPTo){
 //			
 //			// grab the lowest event time TODO: maybe some other way is better
 //			long lowest = Long.MAX_VALUE;
-//			SoccerEvent toRSVPTOEvent = new SoccerEvent();
-//			toRSVPTOEvent.setId("bbxnrqyzfbmb");
-//			toRSVPTOEvent.setTime(1552147200000l);
-//			_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
-//			_allEventsToRSVPToday.add(toRSVPTOEvent);
+//			SoccerEvent toRSVPTOEvent = null;
 //			for(SoccerEvent sE : _allEventsToRSVPToday){
 //				if(sE.getTime() < lowest){
 //					lowest = sE.getTime();
@@ -106,35 +62,72 @@ public class MeetupRestService extends TimerTask {
 //			}		
 //			try {
 //				if(toRSVPTOEvent != null){
-//					Thread.sleep(5000);
-//					System.out.println("Waited");
+//					Thread.sleep(toRSVPTOEvent.getTimeMilliSecondsLeftUntilRSVPOpen());
 //				}				
 //			} catch (InterruptedException e) {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
 //			
-//			rsvpToEventWaitlist(_KEY, toRSVPTOEvent.getId());	
-//		}
+//			rsvpToEvent(_KEY, toRSVPTOEvent.getId());	
+//		} 
+//		
 //		// else do nothing
 //	}
-		
-	private boolean checkIfAnythingToRSVPToday() {
-		
-		Date date = new Date();
-		long currentTimeEpochMilliSeconds = date.getTime();
-		_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
-		
-		for(SoccerEvent sE : _allEvents){
-			long timeMilliSecondsLeftUntilRsvpOpen = (sE.getTime() - sE.getMilliSecondsPTGameTimeOpening()) - currentTimeEpochMilliSeconds;			
-			if(timeMilliSecondsLeftUntilRsvpOpen < fONCE_PER_DAY){
-				sE.setTimeMilliSecondsLeftUntilRSVPOpen(timeMilliSecondsLeftUntilRsvpOpen);
-				_allEventsToRSVPToday.add(sE);
-			}
-		}
 	
-		return !_allEventsToRSVPToday.isEmpty();
+	
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		getAllUpCommingEvents();
+		printAllEventsCollection();
+		boolean eventsToRSVPTo = true; //checkIfAnythingToRSVPToday();
+		
+		if(eventsToRSVPTo){
+			
+			// grab the lowest event time TODO: maybe some other way is better
+			long lowest = Long.MAX_VALUE;
+			SoccerEvent toRSVPTOEvent = new SoccerEvent();
+			toRSVPTOEvent.setId("bbxnrqyzfbmb");
+			toRSVPTOEvent.setTime(1552147200000l);
+			
+			_allEventsToRSVPToday.add(toRSVPTOEvent);
+			for(SoccerEvent sE : _allEventsToRSVPToday){
+				if(sE.getTime() < lowest){
+					lowest = sE.getTime();
+				}
+			}		
+			try {
+				if(toRSVPTOEvent != null){
+					Thread.sleep(5000);
+					System.out.println("Waited");
+				}				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			rsvpToEventWaitlist(_KEY, toRSVPTOEvent.getId());	
+		}
+		// else do nothing
 	}
+		
+//	private boolean checkIfAnythingToRSVPToday() {
+//		
+//		Date date = new Date();
+//		long currentTimeEpochMilliSeconds = date.getTime();
+//		_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
+//		
+//		for(SoccerEvent sE : _allEvents){
+//			long timeMilliSecondsLeftUntilRsvpOpen = (sE.getTime() - sE.getMilliSecondsPTGameTimeOpening()) - currentTimeEpochMilliSeconds;			
+//			if(timeMilliSecondsLeftUntilRsvpOpen < fONCE_PER_DAY){
+//				sE.setTimeMilliSecondsLeftUntilRSVPOpen(timeMilliSecondsLeftUntilRsvpOpen);
+//				_allEventsToRSVPToday.add(sE);
+//			}
+//		}
+//	
+//		return !_allEventsToRSVPToday.isEmpty();
+//	}
 
 
 	private static Date getTomorrowMorning7am(){
@@ -151,41 +144,42 @@ public class MeetupRestService extends TimerTask {
 		return result.getTime();	
 	}
 
-//	private static void readKeyFromFile() {
-//		
-//		try {
-//			BufferedReader buffFileReader;
-//			URL path = MeetupRestService.class.getResource("com/momeni/meetuprsvp/keys.txt");
-//			File file = new File(path.getFile()); 
-//			buffFileReader = new BufferedReader(new FileReader(file));
-//			String st; 
-//			  try {
-//				while ((st = buffFileReader.readLine()) != null) 
-//				  {
-//					  if(st.isEmpty() || st == null){
-//						  System.out.println("Key file corrupt");
-//						  System.exit(-1);
-//					  }
-//					  _KEY = st; 
-//				  }
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			} 
-//		} catch (FileNotFoundException e1) {
-//			e1.printStackTrace();
-//		} 		 
-//		  
-//		_KEY = _KEY.trim();
-//	}
+	private static void readKeyFromFile() {
+		
+		try {
+			BufferedReader buffFileReader;
+			URL path = MeetupRestService.class.getResource("keys.txt");
+			File file = new File(path.getFile()); 
+			buffFileReader = new BufferedReader(new FileReader(file));
+			String st; 
+			  try {
+				while ((st = buffFileReader.readLine()) != null) 
+				  {
+					  if(st.isEmpty() || st == null){
+						  System.out.println("Key file corrupt");
+						  System.exit(-1);
+					  }
+					  _KEY = st; 
+				  }
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} 		 
+		  
+		_KEY = _KEY.trim();
+	}
 
 	
 	private static void getAllUpCommingEvents(){
 		
 		_allEvents = new LinkedList<SoccerEvent>();
 		
-		try{		
+		try{
+			
 			System.out.println("getAllUpCommingEvents() => Connecting to server...");
-			URL url = new URL("https://api.meetup.com/Cottonwood-Co-Ed-Adult-Soccer/events?key=" + _MeetupKeys.get(0));
+			URL url = new URL("https://api.meetup.com/Cottonwood-Co-Ed-Adult-Soccer/events?key=" + _KEY);
 
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
