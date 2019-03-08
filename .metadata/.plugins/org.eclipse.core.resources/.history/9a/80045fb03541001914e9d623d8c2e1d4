@@ -47,6 +47,7 @@ public class MeetupRestService extends TimerTask {
 		System.out.println("TimerTask scheduled to run 7am every morning...");
 	}
 
+
 	@SuppressWarnings("unused")
 	@Override
 	public void run() {
@@ -83,8 +84,44 @@ public class MeetupRestService extends TimerTask {
 		System.out.println("No events to Rsvp to today...");
 		return;	
 	}
-
-
+	
+// Run method to roughly test this class	
+//	@Override
+//	public void run() {
+//		// TODO Auto-generated method stub
+//		getAllUpCommingEvents();
+//		printAllEventsCollection();
+//		boolean eventsToRSVPTo = true; //checkIfAnythingToRSVPToday();
+//		
+//		if(eventsToRSVPTo){
+//			
+//			// grab the lowest event time TODO: maybe some other way is better
+//			long lowest = Long.MAX_VALUE;
+//			SoccerEvent toRSVPTOEvent = new SoccerEvent();
+//			toRSVPTOEvent.setId("bbxnrqyzfbmb");
+//			toRSVPTOEvent.setTime(1552147200000l);
+//			_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
+//			_allEventsToRSVPToday.add(toRSVPTOEvent);
+//			for(SoccerEvent sE : _allEventsToRSVPToday){
+//				if(sE.getTime() < lowest){
+//					lowest = sE.getTime();
+//				}
+//			}		
+//			try {
+//				if(toRSVPTOEvent != null){
+//					Thread.sleep(5000);
+//					System.out.println("Waited");
+//				}				
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			rsvpToEventWaitlist(_KEY, toRSVPTOEvent.getId());	
+//		}
+//		// else do nothing
+//	}
+		
 	private boolean checkIfAnythingToRSVPToday() {
 		
 		Date date = new Date();
@@ -116,6 +153,34 @@ public class MeetupRestService extends TimerTask {
 		);		
 		return result.getTime();	
 	}
+
+//	private static void readKeyFromFile() {
+//		
+//		try {
+//			BufferedReader buffFileReader;
+//			URL path = MeetupRestService.class.getResource("com/momeni/meetuprsvp/keys.txt");
+//			File file = new File(path.getFile()); 
+//			buffFileReader = new BufferedReader(new FileReader(file));
+//			String st; 
+//			  try {
+//				while ((st = buffFileReader.readLine()) != null) 
+//				  {
+//					  if(st.isEmpty() || st == null){
+//						  System.out.println("Key file corrupt");
+//						  System.exit(-1);
+//					  }
+//					  _KEY = st; 
+//				  }
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} 
+//		} catch (FileNotFoundException e1) {
+//			e1.printStackTrace();
+//		} 		 
+//		  
+//		_KEY = _KEY.trim();
+//	}
+
 	
 	private static void getAllUpCommingEvents(){
 		
@@ -299,68 +364,4 @@ public class MeetupRestService extends TimerTask {
 		}
 	  
 	}
-	
-	// Run method to roughly test this class	
-//		@Override
-//		public void run() {
-//			// TODO Auto-generated method stub
-//			getAllUpCommingEvents();
-//			printAllEventsCollection();
-//			boolean eventsToRSVPTo = true; //checkIfAnythingToRSVPToday();
-//			
-//			if(eventsToRSVPTo){
-//				
-//				// grab the lowest event time TODO: maybe some other way is better
-//				long lowest = Long.MAX_VALUE;
-//				SoccerEvent toRSVPTOEvent = new SoccerEvent();
-//				toRSVPTOEvent.setId("bbxnrqyzfbmb");
-//				toRSVPTOEvent.setTime(1552147200000l);
-//				_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
-//				_allEventsToRSVPToday.add(toRSVPTOEvent);
-//				for(SoccerEvent sE : _allEventsToRSVPToday){
-//					if(sE.getTime() < lowest){
-//						lowest = sE.getTime();
-//					}
-//				}		
-//				try {
-//					if(toRSVPTOEvent != null){
-//						Thread.sleep(5000);
-//						System.out.println("Waited");
-//					}				
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//				rsvpToEventWaitlist(_KEY, toRSVPTOEvent.getId());	
-//			}
-//			// else do nothing
-//		}
-	
-//	private static void readKeyFromFile() {
-//	
-//	try {
-//		BufferedReader buffFileReader;
-//		URL path = MeetupRestService.class.getResource("com/momeni/meetuprsvp/keys.txt");
-//		File file = new File(path.getFile()); 
-//		buffFileReader = new BufferedReader(new FileReader(file));
-//		String st; 
-//		  try {
-//			while ((st = buffFileReader.readLine()) != null) 
-//			  {
-//				  if(st.isEmpty() || st == null){
-//					  System.out.println("Key file corrupt");
-//					  System.exit(-1);
-//				  }
-//				  _KEY = st; 
-//			  }
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} 
-//	} catch (FileNotFoundException e1) {
-//		e1.printStackTrace();
-//	} 		 
-//	  
-//	_KEY = _KEY.trim();
-//}
 }

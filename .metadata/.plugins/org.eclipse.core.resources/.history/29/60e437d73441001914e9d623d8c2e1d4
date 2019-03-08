@@ -14,7 +14,6 @@ import java.net.URL;
 
 import org.json.*;
 
-@SuppressWarnings("unused")
 public class MeetupRestService extends TimerTask {
 
 	private static List<SoccerEvent> _allEvents;
@@ -34,7 +33,7 @@ public class MeetupRestService extends TimerTask {
 		_MeetupKeys = new ArrayList<String>();
 		_MeetupKeys.add("7e454df4306b31417030a7e5f582b");
 		
-		System.out.println("Starting up... fetching all events");
+		System.out.println("Started up...");
 		getAllUpCommingEvents();
 		printAllEventsCollection();
 		
@@ -44,8 +43,8 @@ public class MeetupRestService extends TimerTask {
 	    //(other styles are possible as well)		
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(CheckEventsTask, getTomorrowMorning7am(), fONCE_PER_DAY);
-		System.out.println("TimerTask scheduled to run 7am every morning...");
 	}
+
 
 	@SuppressWarnings("unused")
 	@Override
@@ -78,13 +77,47 @@ public class MeetupRestService extends TimerTask {
 				rsvpToEvent(_MeetupKeys.get(i), toRSVPToEvent.getId());	
 			}
 			
-		} 		
+		} 
 		// else do nothing and wait for next day for another check
-		System.out.println("No events to Rsvp to today...");
-		return;	
 	}
-
-
+	
+// Run method to roughly test this class	
+//	@Override
+//	public void run() {
+//		// TODO Auto-generated method stub
+//		getAllUpCommingEvents();
+//		printAllEventsCollection();
+//		boolean eventsToRSVPTo = true; //checkIfAnythingToRSVPToday();
+//		
+//		if(eventsToRSVPTo){
+//			
+//			// grab the lowest event time TODO: maybe some other way is better
+//			long lowest = Long.MAX_VALUE;
+//			SoccerEvent toRSVPTOEvent = new SoccerEvent();
+//			toRSVPTOEvent.setId("bbxnrqyzfbmb");
+//			toRSVPTOEvent.setTime(1552147200000l);
+//			_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
+//			_allEventsToRSVPToday.add(toRSVPTOEvent);
+//			for(SoccerEvent sE : _allEventsToRSVPToday){
+//				if(sE.getTime() < lowest){
+//					lowest = sE.getTime();
+//				}
+//			}		
+//			try {
+//				if(toRSVPTOEvent != null){
+//					Thread.sleep(5000);
+//					System.out.println("Waited");
+//				}				
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			rsvpToEventWaitlist(_KEY, toRSVPTOEvent.getId());	
+//		}
+//		// else do nothing
+//	}
+		
 	private boolean checkIfAnythingToRSVPToday() {
 		
 		Date date = new Date();
@@ -116,6 +149,34 @@ public class MeetupRestService extends TimerTask {
 		);		
 		return result.getTime();	
 	}
+
+//	private static void readKeyFromFile() {
+//		
+//		try {
+//			BufferedReader buffFileReader;
+//			URL path = MeetupRestService.class.getResource("com/momeni/meetuprsvp/keys.txt");
+//			File file = new File(path.getFile()); 
+//			buffFileReader = new BufferedReader(new FileReader(file));
+//			String st; 
+//			  try {
+//				while ((st = buffFileReader.readLine()) != null) 
+//				  {
+//					  if(st.isEmpty() || st == null){
+//						  System.out.println("Key file corrupt");
+//						  System.exit(-1);
+//					  }
+//					  _KEY = st; 
+//				  }
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} 
+//		} catch (FileNotFoundException e1) {
+//			e1.printStackTrace();
+//		} 		 
+//		  
+//		_KEY = _KEY.trim();
+//	}
+
 	
 	private static void getAllUpCommingEvents(){
 		
@@ -168,11 +229,12 @@ public class MeetupRestService extends TimerTask {
 		}
 	}
 	
+
 	private static SoccerEvent fillSoccerEventObjectFromJSONObject(JSONObject event){
 		
 		SoccerEvent soccEvent = null;
 		try{
-			
+		
 			if(event.has("id") && event.has("name") && event.has("time") && event.has("local_date") && event.has("local_time") && event.has("rsvp_open_offset")){
 				soccEvent = new SoccerEvent();
 				soccEvent.setId(event.getString("id"));
@@ -189,66 +251,6 @@ public class MeetupRestService extends TimerTask {
 			e.printStackTrace();
 		}
 		return soccEvent;
-	}
-	
-	@SuppressWarnings("unused")
-	private static void rsvpToEvent(String key, String eventId) {
-		
-		try {	
-			System.out.println("rsvpToEvent() => Connecting to server...");
-			URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=yes&key="+key);
-			System.out.println(url.toString());
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
-
-			OutputStream os = conn.getOutputStream();
-			os.flush();
-
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-				throw new RuntimeException("Failed : HTTP error code : "
-						+ conn.getResponseCode());
-			}
-			
-			System.out.println("rsvpToEvent() => Server responded with 201 Created...");
-
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
-
-			String output;
-			System.out.println("Output from Server .... \n");
-			
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-
-			conn.disconnect();
-
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}  
-	}
-	
-	private static void printAllEventsCollection(){
-		
-		if(_allEvents.isEmpty()){
-			return;
-		}		
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
-		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getMilliSecondsPTGameTimeOpening());
-		}
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
-		System.out.println("================================================================================================================================");
 	}
 	
 	@SuppressWarnings("unused")
@@ -300,67 +302,63 @@ public class MeetupRestService extends TimerTask {
 	  
 	}
 	
-	// Run method to roughly test this class	
-//		@Override
-//		public void run() {
-//			// TODO Auto-generated method stub
-//			getAllUpCommingEvents();
-//			printAllEventsCollection();
-//			boolean eventsToRSVPTo = true; //checkIfAnythingToRSVPToday();
-//			
-//			if(eventsToRSVPTo){
-//				
-//				// grab the lowest event time TODO: maybe some other way is better
-//				long lowest = Long.MAX_VALUE;
-//				SoccerEvent toRSVPTOEvent = new SoccerEvent();
-//				toRSVPTOEvent.setId("bbxnrqyzfbmb");
-//				toRSVPTOEvent.setTime(1552147200000l);
-//				_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
-//				_allEventsToRSVPToday.add(toRSVPTOEvent);
-//				for(SoccerEvent sE : _allEventsToRSVPToday){
-//					if(sE.getTime() < lowest){
-//						lowest = sE.getTime();
-//					}
-//				}		
-//				try {
-//					if(toRSVPTOEvent != null){
-//						Thread.sleep(5000);
-//						System.out.println("Waited");
-//					}				
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//				rsvpToEventWaitlist(_KEY, toRSVPTOEvent.getId());	
-//			}
-//			// else do nothing
-//		}
+	@SuppressWarnings("unused")
+	private static void rsvpToEvent(String key, String eventId) {
+		
+		try {	
+		
+			URL url = new URL("https://api.meetup.com/2/rsvp/?event_id="+eventId+"&rsvp=yes&key="+key);
+			System.out.println(url.toString());
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("POST");
+			conn.setRequestProperty("Content-Type", "application/json");
+
+			OutputStream os = conn.getOutputStream();
+			os.flush();
+
+			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
+				throw new RuntimeException("Failed : HTTP error code : "
+						+ conn.getResponseCode());
+			}
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					(conn.getInputStream())));
+
+			String output;
+			System.out.println("Output from Server .... \n");
+			
+			while ((output = br.readLine()) != null) {
+				System.out.println(output);
+			}
+
+			conn.disconnect();
+
+		} catch (MalformedURLException e) {
+
+			e.printStackTrace();
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		}
+	  
+	}
 	
-//	private static void readKeyFromFile() {
-//	
-//	try {
-//		BufferedReader buffFileReader;
-//		URL path = MeetupRestService.class.getResource("com/momeni/meetuprsvp/keys.txt");
-//		File file = new File(path.getFile()); 
-//		buffFileReader = new BufferedReader(new FileReader(file));
-//		String st; 
-//		  try {
-//			while ((st = buffFileReader.readLine()) != null) 
-//			  {
-//				  if(st.isEmpty() || st == null){
-//					  System.out.println("Key file corrupt");
-//					  System.exit(-1);
-//				  }
-//				  _KEY = st; 
-//			  }
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} 
-//	} catch (FileNotFoundException e1) {
-//		e1.printStackTrace();
-//	} 		 
-//	  
-//	_KEY = _KEY.trim();
-//}
+	private static void printAllEventsCollection(){
+		
+		if(_allEvents.isEmpty()){
+			return;
+		}		
+		System.out.println("================================================================================================================================");
+		System.out.println("================================================================================================================================");
+		System.out.println("================================================================================================================================");
+		for(SoccerEvent s : _allEvents){
+			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getMilliSecondsPTGameTimeOpening());
+		}
+		System.out.println("================================================================================================================================");
+		System.out.println("================================================================================================================================");
+		System.out.println("================================================================================================================================");
+	}
 }
