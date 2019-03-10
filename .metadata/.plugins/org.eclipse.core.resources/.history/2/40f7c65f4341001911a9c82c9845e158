@@ -18,7 +18,7 @@ import org.json.*;
 public class MeetupRestService extends TimerTask {
 
 	private static List<SoccerEvent> _allEvents;
-	private static List<SoccerEvent> _allEventsToRsvpToToday;
+	private static List<SoccerEvent> _allEventsToRSVPToday;
 	private static List<String> _MeetupKeys;
 	private static Timer timer;
 	
@@ -52,14 +52,14 @@ public class MeetupRestService extends TimerTask {
 	public void run() {
 		// TODO Auto-generated method stub
 		getAllUpCommingEvents();
-		fillAllEventsToRsvpToToday();
+		printAllEventsCollection();
+		boolean eventsToRSVPTo = checkIfAnythingToRSVPToday();
 		
-		if(_allEventsToRsvpToToday.size() > 0){		
+		if(eventsToRSVPTo){		
 			// grab the lowest event time (First game of day if there is multiple games) TODO: maybe some other way is better
 			long lowest = Long.MAX_VALUE;
 			SoccerEvent toRSVPToEvent = null;
-			
-			for(SoccerEvent sE : _allEventsToRsvpToToday){
+			for(SoccerEvent sE : _allEventsToRSVPToday){
 				if(sE.getTime() < lowest){
 					lowest = sE.getTime();
 					toRSVPToEvent = sE;
@@ -67,7 +67,7 @@ public class MeetupRestService extends TimerTask {
 			}		
 			try {
 				if(toRSVPToEvent != null){
-					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
+					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 3 seconds after the rsvp has opened
 				}				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -85,20 +85,21 @@ public class MeetupRestService extends TimerTask {
 	}
 
 
-	private void fillAllEventsToRsvpToToday() {
+	private boolean checkIfAnythingToRSVPToday() {
 		
-		_allEventsToRsvpToToday = new LinkedList<SoccerEvent>();
+		Date date = new Date();
+		long currentTimeEpochMilliSeconds = date.getTime();
+		_allEventsToRSVPToday = new LinkedList<SoccerEvent>();
 		
-		if(!_allEvents.isEmpty()){
-			for(SoccerEvent sE : _allEvents){	
-				if(sE.getTimeMilliSecondsLeftUntilRSVPOpen() < fONCE_PER_DAY && sE.getTimeMilliSecondsLeftUntilRSVPOpen() != -1){
-					_allEventsToRsvpToToday.add(sE);
-				}
+		for(SoccerEvent sE : _allEvents){
+			long timeMilliSecondsLeftUntilRsvpOpen = (sE.getTime() - sE.getMilliSecondsPTGameTimeOpening()) - currentTimeEpochMilliSeconds;			
+			if(timeMilliSecondsLeftUntilRsvpOpen < fONCE_PER_DAY){
+				sE.setTimeMilliSecondsLeftUntilRSVPOpen(timeMilliSecondsLeftUntilRsvpOpen);
+				_allEventsToRSVPToday.add(sE);
 			}
 		}
-		
 	
-		return;
+		return !_allEventsToRSVPToday.isEmpty();
 	}
 
 
@@ -180,8 +181,6 @@ public class MeetupRestService extends TimerTask {
 				soccEvent.setLocal_date(event.getString("local_date"));
 				soccEvent.setLocal_time(event.getString("local_time"));
 				soccEvent.setRsvp_open_offset(event.getString("rsvp_open_offset"));
-				soccEvent.setTimeMilliSecondsLeftUntilRSVPOpen();
-				if(soccEvent.getTimeMilliSecondsLeftUntilRSVPOpen() == -1){ return null; } // in case anything goes wrong with rsvp_open_offset parsing
 			} else{
 				return null;
 			}
@@ -245,7 +244,7 @@ public class MeetupRestService extends TimerTask {
 		System.out.println("================================================================================================================================");
 		System.out.println("================================================================================================================================");
 		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getMilliSecondsFromRsvpOffset());
+			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getMilliSecondsPTGameTimeOpening());
 		}
 		System.out.println("================================================================================================================================");
 		System.out.println("================================================================================================================================");

@@ -1,5 +1,4 @@
 package com.momeni.meetuprsvp;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,20 +51,14 @@ public class SoccerEvent {
 	public long getTimeMilliSecondsLeftUntilRSVPOpen(){
 		return this.timeMilliSecondsLeftUntilRsvpOpen;
 	}
-	public void setTimeMilliSecondsLeftUntilRSVPOpen(){
-		
-		Date date = new Date();
-		long currentTimeEpochMilliSeconds = date.getTime();
-		
-		if(this.getMilliSecondsFromRsvpOffset() == -1){
-			return;
-		}
-
-		this.timeMilliSecondsLeftUntilRsvpOpen = this.getTime() - this.getMilliSecondsFromRsvpOffset() - currentTimeEpochMilliSeconds;	
+	public void setTimeMilliSecondsLeftUntilRSVPOpen(long milliSeconds){
+		this.timeMilliSecondsLeftUntilRsvpOpen = milliSeconds;
+	}
+	public long getMilliSecondsPTGameTimeOpening(){		
+		return this.getSecondsPTGameRSVPOpening()*1000;	
 	}
 	
-	// if anything goes wrong in the parsing of rsvp_open_offset returns -1
-	public long getMilliSecondsFromRsvpOffset(){
+	private long getSecondsPTGameRSVPOpening(){
 		
 		if(this.rsvp_open_offset == null){
 			return -1;
@@ -84,18 +77,18 @@ public class SoccerEvent {
 	    	 hours = m.group("hours");
 	    	 minutes = m.group("minutes"); 	  
 	      } else {
-	         System.out.println("NO MATCH!");
+	         System.out.println("NO MATCH");
 	      }
 	      
-	      if(hours != null && !hours.isEmpty() && minutes != null && !minutes.isEmpty()){
-	    	  return (Long.parseLong(hours)*60*60 + Long.parseLong(minutes)*60)*1000;
-	      } else if(hours != null && !hours.isEmpty() && minutes == null){
-	    	  return (Long.parseLong(hours)*60*60)*1000;
-	      } else if(hours != null && !hours.isEmpty() && minutes.isEmpty()){
-	    	  return (Long.parseLong(hours)*60*60)*1000;
+	      if(hours != null && minutes != null){
+	    	  return Long.parseLong(hours)*60*60 + Long.parseLong(minutes)*60;
+	      } else if(hours != null && minutes == null){
+	    	  return Long.parseLong(hours)*60*60;
 	      }
 	      
 	      return -1;
 	
 	}
+	
+	
 }
