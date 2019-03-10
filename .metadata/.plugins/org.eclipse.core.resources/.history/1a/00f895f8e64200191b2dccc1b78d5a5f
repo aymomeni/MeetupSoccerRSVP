@@ -91,11 +91,13 @@ public class MeetupRestService extends TimerTask {
 		
 		if(!_allEvents.isEmpty()){
 			for(SoccerEvent sE : _allEvents){	
-				if(sE.getTimeMilliSecondsLeftUntilRSVPOpen() < fONCE_PER_DAY && sE.getTimeMilliSecondsLeftUntilRSVPOpen() != -1 && sE.getTimeMilliSecondsLeftUntilRSVPOpen() < 0){
+				if(sE.getTimeMilliSecondsLeftUntilRSVPOpen() < fONCE_PER_DAY && sE.getTimeMilliSecondsLeftUntilRSVPOpen() != -1){
 					_allEventsToRsvpToToday.add(sE);
 				}
 			}
-		}	
+		}
+		
+	
 		return;
 	}
 
@@ -243,7 +245,7 @@ public class MeetupRestService extends TimerTask {
 		System.out.println("================================================================================================================================");
 		System.out.println("================================================================================================================================");
 		for(SoccerEvent s : _allEvents){
-			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getMilliSecondsFromRsvpOffset() + " Time left till RSVP: " + s.getTimeMilliSecondsLeftUntilRSVPOpen());
+			System.out.println(s.getName() + "  " + s.getLocal_date() + " "+ s.getId() + " " + s.getRsvp_open_offset() + " " + s.getTime() + " " + s.getMilliSecondsFromRsvpOffset());
 		}
 		System.out.println("================================================================================================================================");
 		System.out.println("================================================================================================================================");
