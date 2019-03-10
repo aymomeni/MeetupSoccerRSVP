@@ -33,6 +33,7 @@ public class MeetupRestService extends TimerTask {
 		
 		_MeetupKeys = new ArrayList<String>();
 		_MeetupKeys.add("7e454df4306b31417030a7e5f582b");
+		_MeetupKeys.add("1718563a36a77f511c5a462a354f");
 		
 		System.out.println("Starting up... fetching all events");
 		getAllUpCommingEvents();
@@ -64,7 +65,7 @@ public class MeetupRestService extends TimerTask {
 			}		
 			try {
 				if(toRSVPToEvent != null){
-					System.out.println("Wainting for Rsvp to open today in " + toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen() + " milliseconds eventId: " + toRSVPToEvent.getId());
+					System.out.println("Wainting for Rsvp to open today at " + toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen());
 					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
 				}				
 			} catch (InterruptedException e) {
@@ -76,9 +77,7 @@ public class MeetupRestService extends TimerTask {
 				rsvpToEvent(_MeetupKeys.get(i), toRSVPToEvent.getId());	
 			}
 			
-		} else{ 		
-			System.out.println("Nothing to Rsvp to today.");
-		}
+		} 		
 	}
 
 	@SuppressWarnings("unused")
@@ -249,12 +248,12 @@ public class MeetupRestService extends TimerTask {
 					(conn.getInputStream())));
 
 			String output;
-			System.out.println("Output from Server ....");
+			System.out.println("Output from Server .... \n");
 			
 			while ((output = br.readLine()) != null) {
 				System.out.println(output);
 			}
-			System.out.println("");
+
 			conn.disconnect();
 
 		} catch (MalformedURLException e) {
@@ -317,12 +316,12 @@ public class MeetupRestService extends TimerTask {
 					(conn.getInputStream())));
 
 			String output;
-			System.out.println("Output from Server ....");
+			System.out.println("Output from Server .... \n");
 			
 			while ((output = br.readLine()) != null) {
 				System.out.println(output);
 			}
-			System.out.println("");
+
 			conn.disconnect();
 
 		} catch (MalformedURLException e) {
