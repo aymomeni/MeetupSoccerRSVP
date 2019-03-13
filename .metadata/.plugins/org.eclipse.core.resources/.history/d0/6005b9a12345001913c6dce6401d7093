@@ -32,7 +32,8 @@ public class MeetupRestService extends TimerTask {
 	public static void main(String[] args) {
 		
 		_MeetupKeys = new ArrayList<String>();
-		
+		_MeetupKeys.add("6e4f7678624d18267da4618e707e6");
+		_MeetupKeys.add("1718563a36a77f511c5a462a354f");
 		
 		System.out.println("Starting up... fetching all events");
 		getAllUpCommingEvents();
@@ -54,18 +55,18 @@ public class MeetupRestService extends TimerTask {
 		if(_allEventsToRsvpToToday.size() > 0){		
 			// grab the lowest event time (First game of day if there is multiple games) TODO: maybe some other way is better
 			long lowest = Long.MAX_VALUE;
-			SoccerEvent toRsvpToEvent = null;
+			SoccerEvent toRSVPToEvent = null;
 			
 			for(SoccerEvent sE : _allEventsToRsvpToToday){
 				if(sE.getTime() < lowest){
 					lowest = sE.getTime();
-					toRsvpToEvent = sE;
+					toRSVPToEvent = sE;
 				}
 			}		
 			try {
-				if(toRsvpToEvent != null){
-					System.out.println("Wainting for Rsvp to open today in " + toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen() + " milliseconds eventId: " + toRsvpToEvent.getId());
-					Thread.sleep(toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
+				if(toRSVPToEvent != null){
+					System.out.println("Wainting for Rsvp to open today in " + toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen() + " milliseconds eventId: " + toRSVPToEvent.getId());
+					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
 				}				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -73,7 +74,7 @@ public class MeetupRestService extends TimerTask {
 			}
 			
 			for(int i = 0; i < _MeetupKeys.size(); i++){
-				rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId());	
+				rsvpToEvent(_MeetupKeys.get(i), toRSVPToEvent.getId());	
 			}
 			
 		} else{ 		
@@ -86,26 +87,22 @@ public class MeetupRestService extends TimerTask {
 	public void run() {
 		// TODO Auto-generated method stub
 		getAllUpCommingEvents();
-		printAllEventsCollection();
 		fillAllEventsToRsvpToToday();
 		
 		if(_allEventsToRsvpToToday.size() > 0){		
 			// grab the lowest event time (First game of day if there is multiple games) TODO: maybe some other way is better
 			long lowest = Long.MAX_VALUE;
-			SoccerEvent toRsvpToEvent = null;
+			SoccerEvent toRSVPToEvent = null;
 			
-			System.out.println(_allEventsToRsvpToToday.size() + " Events to Rsvp to Today: ");
 			for(SoccerEvent sE : _allEventsToRsvpToToday){
-				System.out.println(sE.getName() + " " + sE.getId());
 				if(sE.getTime() < lowest){
 					lowest = sE.getTime();
-					toRsvpToEvent = sE;
+					toRSVPToEvent = sE;
 				}
 			}		
 			try {
-				if(toRsvpToEvent != null){
-					System.out.println("Wainting for Rsvp to open today in " + toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen() + " milliseconds eventId: " + toRsvpToEvent.getId());
-					Thread.sleep(toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
+				if(toRSVPToEvent != null){
+					Thread.sleep(toRSVPToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
 				}				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -113,21 +110,20 @@ public class MeetupRestService extends TimerTask {
 			}
 			
 			for(int i = 0; i < _MeetupKeys.size(); i++){
-				rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId());
+				rsvpToEvent(_MeetupKeys.get(i), toRSVPToEvent.getId());	
 			}
 			
-		} else {
-			// else do nothing and wait for next day for another check
-			System.out.println("No events to Rsvp to today...");		
-		}
-		System.out.println("TimerTask scheduled to run 7am tomorrow...");
-		return;
+		} 		
+		// else do nothing and wait for next day for another check
+		System.out.println("No events to Rsvp to today...");
+		return;	
 	}
 
 
 	private static void fillAllEventsToRsvpToToday() {
 		
 		_allEventsToRsvpToToday = new LinkedList<SoccerEvent>();
+		
 		if(!_allEvents.isEmpty()){
 			for(SoccerEvent sE : _allEvents){	
 				if(sE.getTimeMilliSecondsLeftUntilRSVPOpen() < fONCE_PER_DAY && sE.getTimeMilliSecondsLeftUntilRSVPOpen() > 0){
@@ -164,7 +160,7 @@ public class MeetupRestService extends TimerTask {
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
 
-			if(conn.getResponseCode() != 200){			
+			if(conn.getResponseCode() != 200){
 				throw new RuntimeException("Failed : Http error code : " 
 					+ conn.getResponseCode());
 			}
@@ -185,7 +181,8 @@ public class MeetupRestService extends TimerTask {
 			
 			JSONArray arr = new JSONArray(sB.toString());
 						
-			for(int i = 0; i < arr.length(); i++){			
+			for(int i = 0; i < arr.length(); i++){
+				
 				JSONObject event = arr.getJSONObject(i);				
 				SoccerEvent sE = fillSoccerEventObjectFromJSONObject(event);				
 				if(sE == null){
@@ -194,7 +191,7 @@ public class MeetupRestService extends TimerTask {
 					_allEvents.add(sE);
 				}				
 			}			
-			System.out.println("getAllUpCommingEvents() => Successfully processed Server response (incl. filling of internal objects)");
+			System.out.println("getAllUpCommingEvents() => Successfully processed Server response");
 			
 		} catch(Exception e){
 			System.out.println("Something failed in getAllUpCommingEvents()");
@@ -242,17 +239,12 @@ public class MeetupRestService extends TimerTask {
 			OutputStream os = conn.getOutputStream();
 			os.flush();
 
-			// If 500 try again
-			if(conn.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR){
-				rsvpToEvent(key, eventId);
-			}
-			
 			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
 				throw new RuntimeException("Failed : HTTP error code : "
 						+ conn.getResponseCode());
 			}
 			
-			System.out.println("rsvpToEvent() => Server responded with 201 Created => eventId " + eventId);
+			System.out.println("rsvpToEvent() => Server responded with 201 Created...");
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					(conn.getInputStream())));
