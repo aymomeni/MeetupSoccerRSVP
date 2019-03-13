@@ -73,7 +73,7 @@ public class MeetupRestService extends TimerTask {
 			}
 			
 			for(int i = 0; i < _MeetupKeys.size(); i++){
-				rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId(), 0);	
+				rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId());	
 			}
 			
 		} else{ 		
@@ -113,7 +113,7 @@ public class MeetupRestService extends TimerTask {
 			}
 			
 			for(int i = 0; i < _MeetupKeys.size(); i++){
-				rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId(), 0);
+				rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId());
 			}
 			
 		} else {
@@ -228,7 +228,7 @@ public class MeetupRestService extends TimerTask {
 	}
 	
 	@SuppressWarnings("unused")
-	private static void rsvpToEvent(String key, String eventId, int count) {
+	private static void rsvpToEvent(String key, String eventId) {
 		
 		try {	
 			System.out.println("rsvpToEvent() => Connecting to server...");
@@ -241,15 +241,15 @@ public class MeetupRestService extends TimerTask {
 
 			OutputStream os = conn.getOutputStream();
 			os.flush();
+
+			// If 500 try again
+			if(conn.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR){
+				rsvpToEvent(key, eventId);
+			}
 			
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {	// 3 recursive tries
-				System.out.println("Failed : Http error code " + conn.getResponseCode());
-				if(count < 3){
-					rsvpToEvent(key, eventId, ++count);
-				} else {
-					throw new RuntimeException("Failed : HTTP error code : "
-							+ conn.getResponseCode());
-				}			
+			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
+				throw new RuntimeException("Failed : HTTP error code : "
+						+ conn.getResponseCode());
 			}
 			
 			System.out.println("rsvpToEvent() => Server responded with 201 Created => eventId " + eventId);
