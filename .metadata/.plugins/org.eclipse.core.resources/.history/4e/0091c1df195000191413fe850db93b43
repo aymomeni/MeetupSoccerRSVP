@@ -29,13 +29,17 @@ public class MeetupRestService extends TimerTask {
 	private final static int fONE_DAY = 1;
 	private final static int fSEVEN_AM = 7;
 	private final static int fZERO_MINUTES = 0;
-	private final static int _minMinutesDelayToRsvp = 1;
-	private final static int _maxMinutesDelayToRsvp = 2; // maximum delay per player would be 7 min
+	private final static int _minMinutesDelayToRsvp = 1*1000*60;
+	private final static int _maxMinutesDelayToRsvp = 7*1000*60; // maximum delay per player would be 7 min
 	
 	public static void main(String[] args) {
 		
 		_MeetupKeys = new ArrayList<String>();
-		// add meetup api keys to _MeetupKeys collection
+		_MeetupKeys.add("6e4f7678624d18267da4618e707e6");
+		_MeetupKeys.add("1718563a36a77f511c5a462a354f");
+		_MeetupKeys.add("25e461878355d10d6b6b2785c335");
+		_MeetupKeys.add("a4e13e567e51d3a451b452213165a");
+
 		
 		_defaultApiKeyForRequests = _MeetupKeys.get(0);
 		
@@ -55,7 +59,7 @@ public class MeetupRestService extends TimerTask {
 
 	private static void initialCheckForRsvpToday() {
 
-		if(_allEventsToRsvpToToday.size() > 0) {		
+		if(_allEventsToRsvpToToday.size() > 0){		
 			// grab the lowest event time (First game of day if there is multiple games) TODO: maybe some other way is better
 			long lowest = Long.MAX_VALUE;
 			SoccerEvent toRsvpToEvent = null;
@@ -69,7 +73,7 @@ public class MeetupRestService extends TimerTask {
 				}
 			}		
 			try {
-				if(toRsvpToEvent != null) {
+				if(toRsvpToEvent != null){
 					System.out.println("Wainting for Rsvp to open today in " + toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen() + " milliseconds eventId: " + toRsvpToEvent.getId());
 					Thread.sleep(toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
 				}				
@@ -77,7 +81,7 @@ public class MeetupRestService extends TimerTask {
 				e.printStackTrace();
 			}
 			
-			for(int i = 0; i < _MeetupKeys.size(); i++) {
+			for(int i = 0; i < _MeetupKeys.size(); i++){
 				int tries = 0;
 				boolean rsvped = false;
 				do { 
@@ -87,7 +91,7 @@ public class MeetupRestService extends TimerTask {
 				while(rsvped == false && tries < 3);	
 			}
 			
-		} else { 		
+		} else{ 		
 			System.out.println("Nothing to Rsvp to today.");
 		}
 	}
@@ -97,13 +101,9 @@ public class MeetupRestService extends TimerTask {
 		// TODO Auto-generated method stub
 		getAllUpCommingEvents(_defaultApiKeyForRequests);
 		printAllEventsCollection();
-		fillAllEventsToRsvpToToday();	
+		fillAllEventsToRsvpToToday();
 		
 		if(_allEventsToRsvpToToday.size() > 0) {		
-			
-			// shuffle the api keys before rsvping so there isn't a continues order in which players are rsvped
-			shuffleMeetupApiKeys();
-			
 			// grab the lowest event time (First game of day if there is multiple games) TODO: maybe some other way is better
 			long lowest = Long.MAX_VALUE;
 			SoccerEvent toRsvpToEvent = null;
@@ -126,9 +126,9 @@ public class MeetupRestService extends TimerTask {
 				e.printStackTrace();
 			}
 						
-			// Checking if today is Saturday and if so brute force rsvps else have a more gentle random delay of 1-2 min before an rsvp
+			// TODO: Checking if today is Saturday and if so brute force rsvps else have a more gentle random delay of 1-4 min approach to rsvp
 			if(isTodaySaturday()) {	
-				
+				// if today is saturday rsvp immediately
 				for(int i = 0; i < _MeetupKeys.size(); i++) {
 					int tries = 0;
 					boolean rsvped = false;
@@ -147,7 +147,7 @@ public class MeetupRestService extends TimerTask {
 				for(int i = 0; i < _MeetupKeys.size(); i++) {
 					int tries = 0;
 					boolean rsvped = false;
-					int randomDelayInMinutes = (int)(Math.random() * _maxMinutesDelayToRsvp + _minMinutesDelayToRsvp)*1000*60;
+					int randomDelayInMinutes = (int)(Math.random() * _maxMinutesDelayToRsvp + _minMinutesDelayToRsvp);
 					try {
 						Thread.sleep((long)randomDelayInMinutes);
 					} catch (InterruptedException e) {
@@ -173,10 +173,6 @@ public class MeetupRestService extends TimerTask {
 		return;
 	}
 	
-	private void shuffleMeetupApiKeys() {
-		Collections.shuffle(_MeetupKeys);
-	}
-
 	private static boolean isTodaySaturday(){
 		
 		Calendar calendar = Calendar.getInstance();
@@ -189,7 +185,9 @@ public class MeetupRestService extends TimerTask {
 		return false;
 	}
 
-	private static void fillAllEventsToRsvpToToday() {		
+
+	private static void fillAllEventsToRsvpToToday() {
+		
 		_allEventsToRsvpToToday = new LinkedList<SoccerEvent>();
 		if(!_allEvents.isEmpty()) {
 			for(SoccerEvent sE : _allEvents) {	
