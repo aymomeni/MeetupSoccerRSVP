@@ -1,5 +1,4 @@
 package com.momeni.meetuprsvp;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,8 +8,8 @@ public class SoccerEvent {
 	private String id;
 	private String name;
 	private long time; // time in milliseconds epoch
-	private String local_date = null;
-	private String local_time = null;
+	private String local_date;
+	private String local_time;
 	private String rsvp_open_offset = null; // Format e.g. PT151H30M -> Prior to event by 151 hours and 30 min
 	private long timeMilliSecondsLeftUntilRsvpOpen = -1;
 	
