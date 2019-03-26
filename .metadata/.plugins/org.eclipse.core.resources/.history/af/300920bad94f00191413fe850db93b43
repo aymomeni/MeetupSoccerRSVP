@@ -32,7 +32,10 @@ public class MeetupRestService extends TimerTask {
 	public static void main(String[] args) {
 		
 		_MeetupKeys = new ArrayList<String>();
-		_MeetupKeys.add("YOURAPIKEYSHERE");
+		_MeetupKeys.add("6e4f7678624d18267da4618e707e6");
+		_MeetupKeys.add("1718563a36a77f511c5a462a354f");
+		_MeetupKeys.add("25e461878355d10d6b6b2785c335");
+		_MeetupKeys.add("a4e13e567e51d3a451b452213165a");
 		
 		System.out.println("Starting up... fetching all events");
 		getAllUpCommingEvents();
