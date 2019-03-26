@@ -58,9 +58,7 @@ public class MeetupRestService extends TimerTask {
 			long lowest = Long.MAX_VALUE;
 			SoccerEvent toRsvpToEvent = null;
 			
-			System.out.println(_allEventsToRsvpToToday.size() + " Events to Rsvp to Today: ");
 			for(SoccerEvent sE : _allEventsToRsvpToToday){
-				System.out.println(sE.getName() + " " + sE.getId());
 				if(sE.getTime() < lowest){
 					lowest = sE.getTime();
 					toRsvpToEvent = sE;

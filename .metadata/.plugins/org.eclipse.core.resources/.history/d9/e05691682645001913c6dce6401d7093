@@ -32,9 +32,7 @@ public class MeetupRestService extends TimerTask {
 	public static void main(String[] args) {
 		
 		_MeetupKeys = new ArrayList<String>();
-		_MeetupKeys.add("6e4f7678624d18267da4618e707e6");
-		_MeetupKeys.add("1718563a36a77f511c5a462a354f");
-		_MeetupKeys.add("25e461878355d10d6b6b2785c335");
+		
 		
 		System.out.println("Starting up... fetching all events");
 		getAllUpCommingEvents();
@@ -58,9 +56,7 @@ public class MeetupRestService extends TimerTask {
 			long lowest = Long.MAX_VALUE;
 			SoccerEvent toRsvpToEvent = null;
 			
-			System.out.println(_allEventsToRsvpToToday.size() + " Events to Rsvp to Today: ");
 			for(SoccerEvent sE : _allEventsToRsvpToToday){
-				System.out.println(sE.getName() + " " + sE.getId());
 				if(sE.getTime() < lowest){
 					lowest = sE.getTime();
 					toRsvpToEvent = sE;
