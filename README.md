@@ -4,7 +4,7 @@
 * TimerTask to setup RSVP scheduling
 * JSON parsing
 
-# What makes this undetectable from the perspective of Meetup Organizers?
+## What makes this undetectable from the perspective of Meetup Organizers?
 * Player (api key) collections are shuffled before rsvps
 * Weekday games have a slight random delay (couple minutes) that make the rsvp process seam like a conventional client side rsvp mechanism
 
