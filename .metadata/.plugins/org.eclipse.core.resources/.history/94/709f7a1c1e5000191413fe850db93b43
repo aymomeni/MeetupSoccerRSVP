@@ -1,7 +1,5 @@
 package com.momeni.meetuprsvp;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,12 +30,15 @@ public class MeetupRestService extends TimerTask {
 	private final static int fSEVEN_AM = 7;
 	private final static int fZERO_MINUTES = 0;
 	private final static int _minMinutesDelayToRsvp = 1;
-	private final static int _maxMinutesDelayToRsvp = 2;
+	private final static int _maxMinutesDelayToRsvp = 2; // maximum delay per player would be 7 min
 	
 	public static void main(String[] args) {
 		
 		_MeetupKeys = new ArrayList<String>();
-		// Meetup API Keys need to be added to the _MeetupKeys
+		_MeetupKeys.add("6e4f7678624d18267da4618e707e6");
+		_MeetupKeys.add("1718563a36a77f511c5a462a354f");
+		_MeetupKeys.add("25e461878355d10d6b6b2785c335");
+		_MeetupKeys.add("a4e13e567e51d3a451b452213165a");
 		
 		_defaultApiKeyForRequests = _MeetupKeys.get(0);
 		
@@ -129,7 +130,7 @@ public class MeetupRestService extends TimerTask {
 			}
 						
 			// Checking if today is Saturday and if so brute force rsvps else have a more gentle random delay of 1-2 min before an rsvp
-			if(gameDayIsASaturday(toRsvpToEvent.getLocal_date())) {	
+			if(isTodaySaturday()) {	
 				
 				for(int i = 0; i < _MeetupKeys.size(); i++) {
 					int tries = 0;
@@ -143,8 +144,7 @@ public class MeetupRestService extends TimerTask {
 					if(rsvped == false && tries == 3){
 						rsvpToEventWaitlist(_MeetupKeys.get(i), toRsvpToEvent.getId());
 					}
-				}
-				
+				}				
 			} else {
 				// if today isn't saturday then give it a bit of delay before rsvp(ing)		
 				for(int i = 0; i < _MeetupKeys.size(); i++) {
@@ -180,31 +180,15 @@ public class MeetupRestService extends TimerTask {
 		Collections.shuffle(_MeetupKeys);
 	}
 
-	private static boolean gameDayIsASaturday(String argDate){
+	private static boolean isTodaySaturday(){
 		
-		// argDate format is expected to be yyyy-MM-dd		
-		if(argDate == null || argDate.isEmpty()){
-			return false;
+		Calendar calendar = Calendar.getInstance();
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		
+		if(day == Calendar.SATURDAY) {
+			return true;
 		}
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
-        Date date;
-		
-        try {
-			date = sdf.parse(argDate);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			return false;
-		} 
-		
-        Calendar cal = Calendar.getInstance(); 
-        cal.setTime(date);
-        int day = cal.get(Calendar.DAY_OF_WEEK);
-        
-        if(day == Calendar.SATURDAY) {
-		    return true;
-	    }
-        
 		return false;
 	}
 
