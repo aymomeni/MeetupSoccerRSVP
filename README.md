@@ -1,10 +1,9 @@
 # Meetup Soccer RSVP
-* A simple java project that that RSVPs soccer players to a local Soccer Meetup group
+* A simple java project that RSVPs soccer players to a local Soccer Meetup group
 * Restful Services to communicate with Meetup.com
 * TimerTask to setup RSVP scheduling
 * JSON parsing
-
-## What makes this undetectable from the perspective of Meetup Organizers?
+* Random time delay approx. 3-15 min
 * Player (api key) collections are shuffled before rsvps
 * Weekday games have a slight random delay (couple minutes) that make the rsvp process seam like a conventional client side rsvp mechanism
 
