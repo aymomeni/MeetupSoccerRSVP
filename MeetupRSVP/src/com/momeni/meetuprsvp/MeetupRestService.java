@@ -31,13 +31,16 @@ public class MeetupRestService extends TimerTask {
 	private final static int fONE_DAY = 1;
 	private final static int fSEVEN_AM = 7;
 	private final static int fZERO_MINUTES = 0;
-	private final static int _minMinutesDelayToRsvp = 1;
-	private final static int _maxMinutesDelayToRsvp = 2;
+	private final static int _minMinutesDelayToRsvp = 1; // for weekday games
+	private final static int _maxMinutesDelayToRsvp = 9;
+	private final static int _minMilliSecondsDelayToRsvpSaturdays = 100; // for Saturday games
+	private final static int _maxMilliSecondsDelayToRsvpSaturdays = 400;
 	
 	public static void main(String[] args) {
 		
 		_MeetupKeys = new ArrayList<String>();
-		// Meetup API Keys need to be added to the _MeetupKeys
+		// Meetup API Keys need to be added to the _MeetupKeys Collection
+
 		
 		_defaultApiKeyForRequests = _MeetupKeys.get(0);
 		
@@ -81,6 +84,27 @@ public class MeetupRestService extends TimerTask {
 			for(int i = 0; i < _MeetupKeys.size(); i++) {
 				int tries = 0;
 				boolean rsvped = false;
+				
+				// Checking if today is Saturday and if so brute force rsvps else have a more gentle random delay of 1-2 min before an rsvp
+				boolean itsASaturdayGame = gameDayIsASaturday(toRsvpToEvent.getLocal_date());
+				
+				if(!itsASaturdayGame)	{
+					int randomDelayInMinutes = (int)(Math.random() * _maxMinutesDelayToRsvp + _minMinutesDelayToRsvp)*1000*60;
+					try {
+						Thread.sleep((long)randomDelayInMinutes);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
+				} else {
+					int randomDelayMilliSecondsForSaturday = (int)(Math.random() * _maxMilliSecondsDelayToRsvpSaturdays + _minMilliSecondsDelayToRsvpSaturdays);
+					try {
+						Thread.sleep((long)randomDelayMilliSecondsForSaturday);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				
 				do { 
 					rsvped = rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId()); 
 					tries++;
@@ -119,7 +143,7 @@ public class MeetupRestService extends TimerTask {
 			try {
 				if(toRsvpToEvent != null) {
 					System.out.println("Waiting for Rsvp to open today in " + toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen() + " milliseconds eventId: " + toRsvpToEvent.getId());
-					Thread.sleep(toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 1 seconds after the rsvp has opened
+					Thread.sleep(toRsvpToEvent.getTimeMilliSecondsLeftUntilRSVPOpen()+1000); // 2 seconds after the rsvp has opened
 				}				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -141,8 +165,17 @@ public class MeetupRestService extends TimerTask {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					
+				} else {
+					int randomDelayMilliSecondsForSaturday = (int)(Math.random() * _maxMilliSecondsDelayToRsvpSaturdays + _minMilliSecondsDelayToRsvpSaturdays);
+					try {
+						Thread.sleep((long)randomDelayMilliSecondsForSaturday);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
-				do { 
+				
+				do {
 					rsvped = rsvpToEvent(_MeetupKeys.get(i), toRsvpToEvent.getId()); 
 					tries++;
 				} while(rsvped == false && tries < 3);
